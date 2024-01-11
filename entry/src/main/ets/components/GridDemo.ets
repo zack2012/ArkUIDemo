@@ -1,11 +1,23 @@
+import ability from '@ohos.ability.ability';
 
 @Entry
 @Component
-struct HorizontalScrollComponent {
+export struct HorizontalScrollComponent {
   @State value: number = 0
   @State simpleList: Array<string> = ['one', 'two', 'three', 'four', '123', '1', '2', '3', '5', '56'];
-  @State itemHeight: number = 2
+  @State itemHeight: number = 50
   private ratio = 1
+
+  @Builder MeasureRect() {
+    Rect().rectStyle(this.ratio).backgroundColor(Color.Green)
+      .onAreaChange((oldValue, newValue) => {
+        console.log(`${oldValue.height}, ${newValue.height}`)
+        const height = newValue.height as number
+        if (this.itemHeight !== height) {
+          this.itemHeight = height
+        }
+      })
+  }
 
   build() {
     Column() {
@@ -14,13 +26,7 @@ struct HorizontalScrollComponent {
           GridItem() {
             Stack() {
               Rect().rectStyle(this.ratio)
-                .onAreaChange((oldValue, newValue) => {
-                  console.log(`${oldValue.height}, ${newValue.height}`)
-                  const height = newValue.height as number
-                  if (this.itemHeight !== height) {
-                    this.itemHeight = height
-                  }
-                })
+
               Text(item)
             }
             .clip(true)
@@ -30,11 +36,13 @@ struct HorizontalScrollComponent {
       }
       .rowsTemplate('1fr')
       .columnsGap(5)
+      .rowsGap(5)
       .width('100%')
       .backgroundColor(Color.Pink)
       .scrollBar(BarState.Off)
       .padding(10)
     }
+    .background(this.MeasureRect)
     .height(this.itemHeight + 20)
   }
 }
